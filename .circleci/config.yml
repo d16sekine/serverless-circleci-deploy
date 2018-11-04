@@ -48,6 +48,9 @@ jobs:
         name: install-serverless
         command: sudo npm install -g serverless
 
+    - run:
+        name: serverless deploy
+        command: sls deoploy
 #   deploy-stg:
 #     docker:
 #       # specify the version you desire here
