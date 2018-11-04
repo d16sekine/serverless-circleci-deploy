@@ -23,37 +23,30 @@ jobs:
           name: Check
           command: ls -la
 
-      - run:
-          name: install-serverless
-          command: sudo npm install -g serverless
+      - persist_to_workspace: 
+          root: ~/repo
+          paths:
+            - ./*
 
-      - run:
-          name: Check
-          command: ls -la
+  deploy-dev:
+    docker:
+    # specify the version you desire here
+    - image: circleci/node:10.9
 
+    working_directory: ~/repo
 
+    steps:
 
-#   deploy-dev:
-#     docker:
-#       # specify the version you desire here
-#       - image: circleci/node:10.9
+    - attach_workspace:
+        at: ~/repo
 
-#     working_directory: ~/repo
+    - run:
+        name: Check
+        command: ls -la
 
-#     steps:
-
-#       - attach_workspace:
-#           at: ~/repo
-
-#       - run:
-#           name: install aws cli
-#           command: sudo apt-get -y -qq install awscli
-#       - run:
-#           name: Check
-#           command: ls -la
-#       - run:
-#           name: deploy S3
-#           command: aws s3 sync dist s3://ener-auction-develop/
+    - run:
+        name: install-serverless
+        command: sudo npm install -g serverless
 
 #   deploy-stg:
 #     docker:
@@ -105,17 +98,19 @@ jobs:
 #           name: deploy S3
 #           command: aws s3 sync dist s3://auctions.enerbank.co.jp/ --region ap-northeast-1
 
-# workflows:
-#   version: 2
-#   build_and_deploy: # workflow名
-#     jobs:
-#       - build
-#       - deploy-dev:
-#           requires: # buildが成功したら実行する
-#             - build
-#           filters: # developブランチの場合のデプロイす
-#             branches:
-#               only: develop
+workflows:
+  version: 2
+  build_and_deploy: # workflow名
+    jobs:
+      - build
+      - deploy-dev:
+          requires: # buildが成功したら実行する
+            - build
+          filters: # developブランチの場合のデプロイす
+            branches:
+              only: 
+                - develop
+                - master
 
 #       - deploy-stg:
 #           requires: # buildが成功したら実行する
